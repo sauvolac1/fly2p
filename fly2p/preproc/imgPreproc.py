@@ -126,7 +126,7 @@ def loadImagingTimeseries(path2imgdat):
     return imgTS
 
 ## CONVERT TO XARRAY
-def stack2xarray(stack, basicMetadat, data4D = True):
+def stack2xarray(stack, basicMetadat, data4D = True, subtractMin=False):
     volcoords = [i/basicMetadat['scanVolumeRate'] for i in range(stack.shape[0])]
     if data4D:
         slices = [i*basicMetadat['stackZStepSize'] for i in range(stack.shape[1])]
@@ -141,8 +141,9 @@ def stack2xarray(stack, basicMetadat, data4D = True):
         imgStack = xr.DataArray(stack, coords = [volcoords, xpx, ypx],
                             dims = ['volumes [s]', 'xpix [µm]', 'ypix [µm]'])
 
-    minval = np.min(imgStack)
-    if minval < 0: imgStack = imgStack - minval
+    if subtractMin:
+        minval = np.min(imgStack)
+        if minval < 0: imgStack = imgStack - minval
 
     return imgStack
 
